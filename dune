@@ -1,0 +1,8 @@
+(library
+ (name inifiles)
+ (package ocaml-inifiles)
+ (libraries pcre2))
+
+(ocamllex inilexer)
+
+(menhir (modules parseini))
