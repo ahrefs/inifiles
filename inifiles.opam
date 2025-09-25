@@ -1,9 +1,16 @@
 opam-version: "2.0"
 synopsis: "An ini file parser"
 maintainer: ["Emile Trotignon"]
+x-maintenance-intent: ["(latest)"]
 license: "LGPL-2.1-or-later"
 homepage: "https://github.com/ahrefs/inifiles"
-depends: ["ocaml" "ocamlfind" "pcre2"]
+depends: [
+  "ocaml"
+  "dune" {>= "3.13"}
+  "ocamlfind"
+  "pcre2"
+  "menhir" {>= "20180528"}
+]
 conflicts: ["ocaml-option-bytecode-only"]
 build: [
   ["dune" "subst"] {dev}

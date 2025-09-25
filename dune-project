@@ -1,3 +1,3 @@
-(lang dune 3.20)
+(lang dune 3.13)
 
 (using menhir 3.0)
