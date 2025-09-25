@@ -5,4 +5,4 @@
 
 (ocamllex inilexer)
 
-(menhir (modules parseini))
+(ocamlyacc (modules parseini))
