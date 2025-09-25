@@ -1,6 +1,6 @@
 (library
  (name inifiles)
- (package ocaml-inifiles)
+ (public_name inifiles)
  (libraries pcre2))
 
 (ocamllex inilexer)
