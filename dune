@@ -1,7 +1,7 @@
 (library
  (name inifiles)
  (public_name inifiles)
- (libraries pcre2))
+ (libraries pcre2 unix))
 
 (ocamllex inilexer)
 
