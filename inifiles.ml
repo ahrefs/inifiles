@@ -74,7 +74,7 @@ let rec filterfile ?(buf=Buffer.create 500) f fd =
 	filterfile ~buf f fd
   with End_of_file -> Buffer.contents buf
 
-let rec read_inifile file fd tbl =
+let read_inifile file fd tbl =
   let lxbuf =
     Lexing.from_string
       (filterfile
@@ -91,8 +91,12 @@ let rec read_inifile file fd tbl =
 		  (Hashtbl.create 10)
 		  values))
 	  parsed_file
-    with Parsing.Parse_error | Failure "lexing: empty token" ->
-      raise (Ini_parse_error (lxbuf.Lexing.lex_curr_p.Lexing.pos_lnum, file))
+    with
+      | Parsing.Parse_error ->
+        raise (Ini_parse_error (lxbuf.Lexing.lex_curr_p.Lexing.pos_lnum, file))
+      | Failure s when s = "lexing: empty token" ->
+        raise (Ini_parse_error (lxbuf.Lexing.lex_curr_p.Lexing.pos_lnum, file))
+      | otherwise -> raise otherwise
 
 let write_inifile fd tbl =
   Hashtbl.iter
@@ -206,7 +210,7 @@ object (self)
 
   method sects =
     (Hashtbl.fold
-       (fun k v keys -> k :: keys)
+       (fun k _v keys -> k :: keys)
        data [])
 
   method iter func sec =
@@ -218,7 +222,7 @@ object (self)
     (Strset.elements
        (setOfList
 	  (Hashtbl.fold
-	     (fun k v attrs -> k :: attrs)
+	     (fun k _v attrs -> k :: attrs)
 	     (try Hashtbl.find data sec
 	      with Not_found -> raise (Invalid_section sec))
 	     [])))
@@ -243,12 +247,9 @@ let readdir path =
 
 let fold func path initial =
   let check_file path =
-    match
-      (path,
-       (try (Unix.stat path).Unix.st_kind
-	with Unix.Unix_error (_,_,_) -> Unix.S_DIR))
-    with
-	(name, Unix.S_REG) when
+    match (Unix.stat path).Unix.st_kind with
+      | exception Unix.Unix_error (_,_,_) -> false
+      | Unix.S_REG when
 	  (Pcre2.pmatch ~rex:(Pcre2.regexp "^.*\\.ini$") path) ->
 	    true
       | _ -> false
